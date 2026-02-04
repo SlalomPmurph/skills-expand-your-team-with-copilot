@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // School name constant for sharing
+  const SCHOOL_NAME = "Mergington High School";
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -472,6 +475,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Helper function to escape HTML special characters
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
@@ -553,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
       </div>
       <div class="activity-card-actions">
-        <button class="share-button" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}" title="Share this activity">
+        <button class="share-button" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" data-schedule="${escapeHtml(formattedSchedule)}" title="Share this activity">
           <span class="share-icon">🔗</span>
           <span class="share-text">Share</span>
         </button>
@@ -814,7 +824,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const schedule = event.currentTarget.dataset.schedule;
     
     const shareData = {
-      title: `${activityName} - Mergington High School`,
+      title: `${activityName} - ${SCHOOL_NAME}`,
       text: `Check out this activity: ${activityName}\n${description}\nSchedule: ${schedule}`,
       url: window.location.href
     };
@@ -852,7 +862,8 @@ document.addEventListener("DOMContentLoaded", () => {
           showMessage("Unable to share. Please copy the link manually.", "error");
         });
     } else {
-      // Legacy fallback for older browsers
+      // Legacy fallback for older browsers that don't support Clipboard API
+      // Note: document.execCommand('copy') is deprecated but necessary for older browser support
       const textArea = document.createElement("textarea");
       textArea.value = textToCopy;
       textArea.style.position = "fixed";
