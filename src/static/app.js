@@ -553,6 +553,10 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
       </div>
       <div class="activity-card-actions">
+        <button class="share-button" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}" title="Share this activity">
+          <span class="share-icon">🔗</span>
+          <span class="share-text">Share</span>
+        </button>
         ${
           currentUser
             ? `
@@ -576,6 +580,10 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
     });
+
+    // Add click handler for share button
+    const shareButton = activityCard.querySelector(".share-button");
+    shareButton.addEventListener("click", handleShare);
 
     // Add click handler for register button (only when authenticated)
     if (currentUser) {
@@ -797,6 +805,71 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
     );
+  }
+
+  // Handle share button click
+  async function handleShare(event) {
+    const activityName = event.currentTarget.dataset.activity;
+    const description = event.currentTarget.dataset.description;
+    const schedule = event.currentTarget.dataset.schedule;
+    
+    const shareData = {
+      title: `${activityName} - Mergington High School`,
+      text: `Check out this activity: ${activityName}\n${description}\nSchedule: ${schedule}`,
+      url: window.location.href
+    };
+
+    // Try to use the Web Share API first (mobile and modern browsers)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        showMessage("Activity shared successfully!", "success");
+      } catch (error) {
+        // User cancelled or error occurred
+        if (error.name !== 'AbortError') {
+          console.error("Error sharing:", error);
+          fallbackShare(shareData);
+        }
+      }
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      fallbackShare(shareData);
+    }
+  }
+
+  // Fallback sharing method - copy link to clipboard
+  function fallbackShare(shareData) {
+    const textToCopy = `${shareData.text}\n\n${shareData.url}`;
+    
+    // Try to use the Clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => {
+          showMessage("Activity details copied to clipboard!", "success");
+        })
+        .catch((error) => {
+          console.error("Error copying to clipboard:", error);
+          showMessage("Unable to share. Please copy the link manually.", "error");
+        });
+    } else {
+      // Legacy fallback for older browsers
+      const textArea = document.createElement("textarea");
+      textArea.value = textToCopy;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        showMessage("Activity details copied to clipboard!", "success");
+      } catch (error) {
+        console.error("Error copying to clipboard:", error);
+        showMessage("Unable to share. Please copy the link manually.", "error");
+      }
+      
+      document.body.removeChild(textArea);
+    }
   }
 
   // Show message function
