@@ -401,7 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // Handle difficulty filter
-      if (currentDifficulty && currentDifficulty !== "all") {
+      if (currentDifficulty && currentDifficulty !== "none") {
         queryParams.push(`difficulty=${encodeURIComponent(currentDifficulty)}`);
       }
 
@@ -450,8 +450,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      // Apply "all" difficulty filter (only activities with no difficulty)
-      if (currentDifficulty === "all") {
+      // Apply "none" difficulty filter (only activities with no difficulty)
+      if (currentDifficulty === "none") {
         if (details.difficulty) {
           return;
         }
