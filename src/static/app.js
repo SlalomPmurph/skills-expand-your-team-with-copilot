@@ -2,31 +2,39 @@ document.addEventListener("DOMContentLoaded", () => {
   // Dark mode toggle functionality
   const themeToggle = document.getElementById("theme-toggle");
   const themeToggleText = document.getElementById("theme-toggle-text");
-  const themeIcon = themeToggle.querySelector(".theme-icon");
-
+  
   // Check for saved theme preference or default to light mode
   const currentTheme = localStorage.getItem("theme") || "light";
   document.documentElement.setAttribute("data-theme", currentTheme);
-  updateThemeUI(currentTheme);
 
-  // Theme toggle event listener
-  themeToggle.addEventListener("click", () => {
-    const theme = document.documentElement.getAttribute("data-theme");
-    const newTheme = theme === "light" ? "dark" : "light";
+  // Only set up theme toggle if the elements exist
+  if (themeToggle && themeToggleText) {
+    const themeIcon = themeToggle.querySelector(".theme-icon");
     
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-    updateThemeUI(newTheme);
-  });
+    // Initialize theme UI
+    updateThemeUI(currentTheme);
 
-  // Update theme UI elements
-  function updateThemeUI(theme) {
-    if (theme === "dark") {
-      themeIcon.textContent = "☀️";
-      themeToggleText.textContent = "Light";
-    } else {
-      themeIcon.textContent = "🌙";
-      themeToggleText.textContent = "Dark";
+    // Theme toggle event listener
+    themeToggle.addEventListener("click", () => {
+      const theme = document.documentElement.getAttribute("data-theme");
+      const newTheme = theme === "light" ? "dark" : "light";
+      
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      updateThemeUI(newTheme);
+    });
+
+    // Update theme UI elements
+    function updateThemeUI(theme) {
+      if (themeIcon && themeToggleText) {
+        if (theme === "dark") {
+          themeIcon.textContent = "☀️";
+          themeToggleText.textContent = "Light";
+        } else {
+          themeIcon.textContent = "🌙";
+          themeToggleText.textContent = "Dark";
+        }
+      }
     }
   }
 
